@@ -1,0 +1,136 @@
+
+-- Biblioteca redzlib com tema marrom
+
+local MarketplaceService = game:GetService("MarketplaceService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local Player = Players.LocalPlayer
+local PlayerMouse = Player:GetMouse()
+
+local CoreGui = (gethui and gethui()) or game:GetService("CoreGui");
+
+local redzlib = {
+    Themes = {
+        Brown = {
+            ["Color Hub 1"] = ColorSequence.new({
+                ColorSequenceKeypoint.new(0.00, Color3.fromRGB(65, 40, 20)),
+                ColorSequenceKeypoint.new(0.50, Color3.fromRGB(90, 60, 30)),
+                ColorSequenceKeypoint.new(1.00, Color3.fromRGB(65, 40, 20))
+            }),
+            ["Color Hub 2"] = Color3.fromRGB(80, 50, 25),
+            ["Color Stroke"] = Color3.fromRGB(100, 70, 40),
+            ["Color Theme"] = Color3.fromRGB(120, 80, 40),
+            ["Color Text"] = Color3.fromRGB(245, 235, 220),
+            ["Color Dark Text"] = Color3.fromRGB(200, 180, 160)
+        }
+    },
+    Info = {
+        Version = "1.1.0"
+    },
+    Save = {
+        UISize = {550, 380},
+        TabSize = 160,
+        Theme = "Brown"
+    },
+    Settings = {},
+    Connection = {},
+    Instances = {},
+    Elements = {},
+    Options = {},
+    Flags = {},
+    Tabs = {}
+}
+
+-- Início do painel RH Hub
+
+local Window = redzlib:MakeWindow({
+    Title = "RH Hub",
+    SubTitle = "by RH",
+    SaveFolder = ""
+})
+
+Window:AddMinimizeButton({
+    Button = {
+        Image = redzlib:GetIcon("rbxassetid://123968606273780"),
+        Size = UDim2.fromOffset(60, 60),
+        BackgroundTransparency = 0
+    },
+    Corner = { CornerRadius = UDim.new(0, 6) }
+})
+
+local Main = Window:MakeTab({"Main", "home"})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+if shared.connectCharacter then shared.connectCharacter:Disconnect() end
+shared.connectCharacter = LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+end)
+
+Main:AddSection({"Elementos"})
+
+Main:AddButton({"O botão", function()
+    print("Está funcionado a função")
+end})
+
+local playerValue
+local dropdownPlayers = Main:AddDropdown({
+    Name = "Players List",
+    Description = "",
+    Options = {},
+    Default = "",
+    Flag = "player list",
+    Callback = function(value)
+        playerValue = value
+    end
+})
+
+function UptadePlayers()
+    local TabPlayers = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Name ~= LocalPlayer.Name then
+            table.insert(TabPlayers, player.Name)
+        end
+    end
+    dropdownPlayers:Set(TabPlayers)
+end
+
+UptadePlayers()
+
+Main:AddButton({"Atualizar lista", function()
+    UptadePlayers()
+end})
+
+Main:AddButton({"Mostrar o nome do jogador", function()
+    print("Esse aqui é o player:" .. tostring(playerValue))
+end})
+
+Main:AddToggle({
+    Name = "Aqui é meu toggle",
+    Description = "",
+    Flag = "",
+    Callback = function(value)
+        print("O estado do botão: " .. tostring(value))
+    end
+})
+
+Main:AddSection({"Velocidade do jogador"})
+
+Main:AddSlider({
+    Name = "Modificar velocidade",
+    Min = 16,
+    Max = 1000,
+    Default = 0,
+    Flag = "NumerosValores",
+    Callback = function(value)
+        print("Os estados aqui do slider: " .. value)
+        local humanoid = character:WaitForChild("Humanoid")
+        humanoid.WalkSpeed = value
+    end
+})
